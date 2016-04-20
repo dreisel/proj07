@@ -94,4 +94,97 @@ public class CodeTranslator {
     String translatePush(String segment, int index){
         return null;
     }
+    /*
+    and:
+        @SP
+        AM=M-1
+        D=M
+        A=A-1
+        M=D&M
+    or:
+        @SP
+        AM=M-1
+        D=M
+        A=A-1
+        M=D|M
+    add:
+        @SP
+        AM=M-1
+        D=M
+        A=A-1
+        M=D+M
+    sub:
+        @SP
+        AM=M-1
+        D=M
+        A=A-1
+        M=D-M
+    neg:
+        @sp
+        A=M-1
+        D=0
+        M=D-M
+    not:
+        @sp
+        A=M-1
+        M=!M
+    eq?:
+        @SP
+        AM=M-1 //sp-- m= top of stack
+        D=M
+        A=A-1 M= second of stack
+        D=D-M
+        @TRUE
+        D;JNE
+        @SP
+        A=M-1
+        M=0
+        @END
+        0;JMP
+        (TRUE)
+        @SP
+        A=M-1
+        M=1
+        (END)
+        D=D // nop
+    gt?
+        @SP
+        AM=M-1 //sp-- m= top of stack
+        D=M
+        A=A-1 M= second of stack
+        D=D-M
+        @TRUE
+        D;JGT
+        @SP
+        A=M-1
+        M=0
+        @END
+        0;JMP
+        (TRUE)
+        @SP
+        A=M-1
+        M=1
+        (END)
+        D=D // nop
+
+    lt?:
+        @SP
+        AM=M-1 //sp-- m= top of stack
+        D=M
+        A=A-1 M= second of stack
+        D=D-M
+        @TRUE
+        D;JLT
+        @SP
+        A=M-1
+        M=0
+        @END
+        0;JMP
+        (TRUE)
+        @SP
+        A=M-1
+        M=1
+        (END)
+        D=D // nop
+     */
 }
