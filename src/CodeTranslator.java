@@ -11,24 +11,7 @@ public class CodeTranslator {
             "AM=M-1\n" +
             "D=M\n" +
             "A=A-1\n";
-   /* String compareFormat =
-            "@SP\n" +
-            "AM=M-1\n" +
-            "D=M\n" +
-            "A=A-1\n" +
-            "D=M-D\n" +
-            "@FALSE" + arthJumpFlag + "\n" +
-            "D;" + type + "\n" +
-            "@SP\n" +
-            "A=M-1\n" +
-            "M=-1\n" +
-            "@CONTINUE" + arthJumpFlag + "\n" +
-            "0;JMP\n" +
-            "(FALSE" + arthJumpFlag + ")\n" +
-            "@SP\n" +
-            "A=M-1\n" +
-            "M=0\n" +
-            "(CONTINUE" + arthJumpFlag + ")\n";*/
+
     final String pushLocalFormat =
         "@LCL\n" +
         "D=M\n"+
@@ -49,18 +32,18 @@ public class CodeTranslator {
         "@SP\n" +
         "M=M+1\n";
     String popLocalFormat =
-        "@LCL" +
-        "D=M" +
-        "@index" +
-        "D=D+A" + //d = pop destination (local var)
-        "@R13" +
-        "M=D" + //r13 = pop destination (temp)
-        "@SP" +
-        "AM=M-1" + //a=*sp--
-        "D=M" + //d is the poped value
-        "@R13" +
-        "A=M" +
-        "M=D" ;
+        "@LCL\n" +
+        "D=M\n" +
+        "@index\n" +
+        "D=D+A\n" + //d = pop destination (local var)
+        "@R13\n" +
+        "M=D\n" + //r13 = pop destination (temp)
+        "@SP\n" +
+        "AM=M-1\n" + //a=*sp--
+        "D=M\n" + //d is the poped value
+        "@R13\n" +
+        "A=M\n" +
+        "M=D\n" ;
     Map<String,String> pushMap;
 
 
@@ -96,95 +79,95 @@ public class CodeTranslator {
     }
     /*
     and:
-        @SP
-        AM=M-1
-        D=M
-        A=A-1
-        M=D&M
+        @SP\n
+        AM=M-1\n
+        D=M\n
+        A=A-1\n
+        M=D&M\n
     or:
-        @SP
-        AM=M-1
-        D=M
-        A=A-1
-        M=D|M
+        @SP\n
+        AM=M-1\n
+        D=M\n
+        A=A-1\n
+        M=D|M\n
     add:
-        @SP
-        AM=M-1
-        D=M
-        A=A-1
-        M=D+M
+        @SP\n
+        AM=M-1\n
+        D=M\n
+        A=A-1\n
+        M=D+M\n
     sub:
-        @SP
-        AM=M-1
-        D=M
-        A=A-1
-        M=D-M
+        @SP\n
+        AM=M-1\n
+        D=M\n
+        A=A-1\n
+        M=D-M\n
     neg:
-        @sp
-        A=M-1
-        D=0
-        M=D-M
+        @sp\n
+        A=M-1\n
+        D=0\n
+        M=D-M\n
     not:
-        @sp
-        A=M-1
-        M=!M
+        @sp\n
+        A=M-1\n
+        M=!M\n
     eq?:
-        @SP
-        AM=M-1 //sp-- m= top of stack
-        D=M
-        A=A-1 M= second of stack
-        D=D-M
-        @TRUE
-        D;JNE
-        @SP
-        A=M-1
-        M=0
-        @END
-        0;JMP
-        (TRUE)
-        @SP
-        A=M-1
-        M=1
-        (END)
-        D=D // nop
+        @SP\n
+        AM=M-1\n //sp-- m= top of stack
+        D=M\n
+        A=A-1\n // M= second of stack
+        D=D-M\n
+        @TRUE\n
+        D;JNE\n
+        @SP\n
+        A=M-1\n
+        M=0\n
+        @END\n
+        0;JMP\n
+        (TRUE)\n
+        @SP\n
+        A=M-1\n
+        M=1\n
+        (END)\n
+        D=D\n // nop
     gt?
-        @SP
-        AM=M-1 //sp-- m= top of stack
-        D=M
-        A=A-1 M= second of stack
-        D=D-M
-        @TRUE
-        D;JGT
-        @SP
-        A=M-1
-        M=0
-        @END
-        0;JMP
-        (TRUE)
-        @SP
-        A=M-1
-        M=1
-        (END)
-        D=D // nop
+        @SP\n
+        AM=M-1\n //sp-- m= top of stack
+        D=M\n
+        A=A-1\n M= second of stack
+        D=D-M\n
+        @TRUE\n
+        D;JGT\n
+        @SP\n
+        A=M-1\n
+        M=0\n
+        @END\n
+        0;JMP\n
+        (TRUE)\n
+        @SP\n
+        A=M-1\n
+        M=1\n
+        (END)\n
+        D=D\n // nop
 
     lt?:
-        @SP
-        AM=M-1 //sp-- m= top of stack
-        D=M
-        A=A-1 M= second of stack
-        D=D-M
-        @TRUE
-        D;JLT
-        @SP
-        A=M-1
-        M=0
-        @END
-        0;JMP
-        (TRUE)
-        @SP
-        A=M-1
-        M=1
-        (END)
-        D=D // nop
+        @SP\n
+        AM=M-1\n //sp-- m= top of stack
+        D=M\n
+        A=A-1\n M= second of stack
+        D=D-M\n
+        @TRUE\n
+        D;JLT\n
+        @SP\n
+        A=M-1\n
+        M=0\n
+        @END\n
+        0;JMP\n
+        (TRUE)\n
+        @SP\n
+        A=M-1\n
+        M=1\n
+        (END)\n
+        D=D\n // nop
      */
 }
