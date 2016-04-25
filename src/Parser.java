@@ -1,4 +1,7 @@
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * ret
@@ -7,30 +10,47 @@ import java.io.*;
 public class Parser {
     File input;
     File output;
-    CodeTranslator codeTranslator = new CodeTranslator();
+    CodeTranslator codeTranslator;
+    String fileName;
+    Set arithmeticSet;
+    final String arithmetics = "add,sub,neg,eq,gt,lt,and,or,not";
     public enum CommandTypes{
-        C_ARITHMETIC,
-        C_POP,
-        C_PUSH,
-        C_LABLE,
-        C_GOTO,
-        C_IF,
-        C_FUNCTION,
-        C_RETURN,
-        C_CALL
+        C_ARITHMETIC("arithmetic"),
+        C_POP("pop"),
+        C_PUSH("push"),
+        C_LABLE("lable"),
+        C_GOTO("goto"),
+        C_IF("if"),
+        C_FUNCTION("function"),
+        C_RETURN("return"),
+        C_CALL("call");
+        private String type;
+
+        CommandTypes(String type) {
+            this.type = type;
+
+        }
+
     }
 
-    public Parser(File file) {
-            this.input = file;
+    public Parser(File file , String fileName) {
+        this.arithmeticSet = new HashSet(Arrays.asList(arithmetics.split(",")));
+        this.input = file;
+        this.fileName = fileName;
+        this.codeTranslator = new CodeTranslator(fileName);
+
     }
 
     void parse(){
         PrintWriter writer = null;
         BufferedReader br = null;
         try {
+            String outputPath = input.getAbsolutePath().replace(".vm", ".asm");
+            output = new File(outputPath);
             br = new BufferedReader(new FileReader(input));
             String line;
-            writer = new PrintWriter(output, "UTF-8");
+
+            writer = new PrintWriter(output); // Not ascii?
 
             while ((line = br.readLine()) != null) {
                 if(line.contains("//"))
@@ -44,8 +64,9 @@ public class Parser {
                 String command = parseCommand(line,type);
                 writer.println(command);
             }
+            writer.println(codeTranslator.getEndLoop());
         } catch (Exception e){
-            System.err.print("Something Went Wrong");
+            System.err.print("Error while parsing");
         } finally {
             if(writer != null) {
                 writer.flush();
@@ -60,9 +81,18 @@ public class Parser {
     }
 
     CommandTypes commandType(String command){
-        if (command.startsWith("pop")) return CommandTypes.C_POP ;
-        else if (command.startsWith("push")) return CommandTypes.C_PUSH ;
-        else return CommandTypes.C_ARITHMETIC ;
+
+        String type = command.split(" ")[0];
+        if(arithmeticSet.contains(type)){
+            return CommandTypes.C_ARITHMETIC;
+        }
+        try {
+            return CommandTypes.valueOf(type);
+        } catch (Exception ignored){
+            throw new IllegalArgumentException("Illegal command type");
+        }
+
+
     }
 
     String parseCommand(String command, CommandTypes type){
@@ -71,20 +101,20 @@ public class Parser {
         switch (type){
             case C_ARITHMETIC:
                 return codeTranslator.translateArithmetic(commandArray[0]);
-
             case C_PUSH:
-                 index = Integer.parseInt(commandArray[2]);
+                index = Integer.parseInt(commandArray[2]);
                 return codeTranslator.translatePush(commandArray[1], index);
             case C_POP:
                 index = Integer.parseInt(commandArray[2]);
                 return codeTranslator.translatePop(commandArray[1],index);
+            case C_LABLE:
+            case C_GOTO:
+            case C_IF:
+            case C_FUNCTION:
+            case C_RETURN:
+            case C_CALL:
             default:
                 throw new IllegalArgumentException("un supported command type");
         }
-
     }
-
-
-
-
 }
