@@ -67,7 +67,7 @@ public class CodeTranslator {
     }
 
     String translateArithmetic(String command){
-        return null;
+        return this.arithmeticMap.get(command);
     }
 
     String translatePop(String segment, int index){
