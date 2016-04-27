@@ -15,14 +15,14 @@ public class CodeTranslator {
     final String arithmetic = "add,sub,neg,eq,gt,lt,and,or,not";
     String endLoop = "(ENDLOOP)\n" + "@ENDLOOP\n" + "0;JMP";
     int commandCounter = 0;
-    final String pushFormat = //reg D will be initialized per command
+    final String pushFormat = //reg D will be initialized to hold the value to push into the stack
                     "@SP\n" +
                     "A=M\n" +
                     "M=D\n" +
                     "@SP\n" +
                     "M=M+1\n";
 
-    final String popFormat =   //reg D will be initialized per command
+    final String popFormat =   //reg D will be initialized to hold the address to hold the popped value
                     "@R13\n" +
                     "M=D\n" + //r13 = pop destination (temp)
                     "@SP\n" +
