@@ -1,6 +1,6 @@
 import java.io.File;
 
-public class Main {
+public class VMtranslator {
 
     public static void main(String[] args) {
         if (args.length < 1) {

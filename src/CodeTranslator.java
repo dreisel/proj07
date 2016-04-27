@@ -12,7 +12,7 @@ public class CodeTranslator {
     Map<String,String> regMap;
     Map<String,CommandTypes> cmdMap;
     Set arithmeticSet;
-    final String arithmetics = "add,sub,neg,eq,gt,lt,and,or,not";
+    final String arithmetic = "add,sub,neg,eq,gt,lt,and,or,not";
     String endLoop = "(ENDLOOP)\n" + "@ENDLOOP\n" + "0;JMP";
     int commandCounter = 0;
     final String pushFormat = //reg D will be initialized per command
@@ -45,7 +45,7 @@ public class CodeTranslator {
     }
 
     public CodeTranslator(String fileName) {
-        this.arithmeticSet = new HashSet(Arrays.asList(arithmetics.split(",")));
+        this.arithmeticSet = new HashSet(Arrays.asList(arithmetic.split(",")));
 
         fillArithmeticMap();
         regMap = new HashMap<>();
