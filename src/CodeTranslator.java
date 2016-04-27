@@ -77,7 +77,7 @@ public class CodeTranslator {
             throw new IllegalArgumentException("Illegal command type");
         }
     }
-    
+
     public String getEndLoop() {
         return endLoop;
     }
@@ -89,15 +89,19 @@ public class CodeTranslator {
     }
 
     String translatePop(String segment, int index){
-        //handel's this, that, argument, temp and local
+        //handel's this, that, argument, static, temp and local
         String command = regMap.get(segment);
         if(command != null){
             String setDFormat = "@%s\n" + "D=M\n" + "@%d\n" + "D=D+A\n" + "%s";
             return String.format(setDFormat,command,index,popFormat);
         }
         if (segment.equals("temp")) {
-            String setDFormat = "@R5\n" + "D=A\n" + "@%d\n" + "D=D+A\n" + "%s";
-            return String.format(setDFormat,index,popFormat);
+            String setDFormat =  "@%d\n" + "D=A\n" + "%s";
+            return String.format(setDFormat,index + 5,popFormat);
+        }
+        if (segment.equals("static")) {
+            String setDFormat = "@%s.%d\n" + "D=A\n"  + "%s";
+            return String.format(setDFormat,fileName,index,popFormat);
         }
         if (segment.equals("pointer")){
             String setDFormat = "" ;
@@ -123,12 +127,16 @@ public class CodeTranslator {
             return String.format(setDFormat,command,index,pushFormat);
         }
         if (segment.equals("temp")) {
-            String setDFormat = "@R5\n" + "D=A\n" + "@%d\n" + "A=D+A\n" + "D=M\n" + "%s";
-            return String.format(setDFormat,index,pushFormat);
+            String setDFormat = "@%d\n" +"D=M\n" + "%s";
+            return String.format(setDFormat,index + 5,pushFormat);
         }
         if (segment.equals("constant")) {
             String setDFormat = "@%d\n" + "D=A\n" + "%s";
             return String.format(setDFormat, index,pushFormat);
+        }
+        if (segment.equals("static")) {
+            String setDFormat = "@%s.%d\n" + "D=A\n" + "%s";
+            return String.format(setDFormat,fileName,index,pushFormat);
         }
         if (segment.equals("pointer")){
             String setDFormat = "" ;

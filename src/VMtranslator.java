@@ -1,5 +1,10 @@
 import java.io.File;
-
+/**
+ * created by Daniel Reisel && Ari Zellner on 19/04/16.
+ *              304953243       201524089
+ * nand2tetris project 07
+ *
+ */
 public class VMtranslator {
 
     public static void main(String[] args) {
