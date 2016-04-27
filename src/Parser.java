@@ -1,11 +1,10 @@
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * ret
- * created by Daniel Reisel on 19/04/16.
+ * created by Daniel Reisel && Ari Zellner on 19/04/16.
+ *              304953243       201524089
+ * nand2tetris project 07
+ *
  */
 public class Parser {
     File input;

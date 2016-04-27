@@ -1,7 +1,10 @@
 import java.util.*;
 
 /**
- * created by Daniel Reisel on 19/04/16.
+ * created by Daniel Reisel && Ari Zellner on 19/04/16.
+ *              304953243       201524089
+ * nand2tetris project 07
+ *
  */
 public class CodeTranslator {
     String fileName;
@@ -10,9 +13,7 @@ public class CodeTranslator {
     Map<String,CommandTypes> cmdMap;
     Set arithmeticSet;
     final String arithmetics = "add,sub,neg,eq,gt,lt,and,or,not";
-    String endLoop = "(ENDLOOP)\n" +
-            "@ENDLOOP\n" +
-            "0;JMP";
+    String endLoop = "(ENDLOOP)\n" + "@ENDLOOP\n" + "0;JMP";
     int commandCounter = 0;
     final String pushFormat = //reg D will be initialized per command
                     "@SP\n" +
@@ -76,7 +77,7 @@ public class CodeTranslator {
             throw new IllegalArgumentException("Illegal command type");
         }
     }
-    
+
     public String getEndLoop() {
         return endLoop;
     }
