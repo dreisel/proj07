@@ -13,8 +13,9 @@ public class CodeTranslator {
     Map<String,CommandTypes> cmdMap;
     Set arithmeticSet;
     final String arithmetic = "add,sub,neg,eq,gt,lt,and,or,not";
-    String endLoop = "(ENDLOOP)\n" + "@ENDLOOP\n" + "0;JMP";
+
     int commandCounter = 0;
+    int frameCounter = 0;
     final String pushFormat = //reg D will be initialized to hold the value to push into the stack
                     "@SP\n" +
                     "A=M\n" +
@@ -32,6 +33,14 @@ public class CodeTranslator {
                     "A=M\n" +
                     "M=D\n" ;
 
+    public String initCode(){
+
+        return "@256\n" +
+                "D=A\n" +
+                "@SP\n" +
+                "M=D\n" +
+                translateCall("call Sys.init 0");
+    }
     public enum CommandTypes{
         C_ARITHMETIC,
         C_POP,
@@ -60,10 +69,11 @@ public class CodeTranslator {
         cmdMap.put("pop",CommandTypes.C_POP);
         cmdMap.put("push",CommandTypes.C_PUSH);
         cmdMap.put("goto",CommandTypes.C_GOTO);
-        cmdMap.put("if",CommandTypes.C_IF);
+        cmdMap.put("if-goto",CommandTypes.C_IF);
         cmdMap.put("function",CommandTypes.C_FUNCTION);
         cmdMap.put("return",CommandTypes.C_RETURN);
         cmdMap.put("call",CommandTypes.C_CALL);
+        cmdMap.put("label",CommandTypes.C_LABLE);
     }
 
     CommandTypes commandType(String command){
@@ -76,10 +86,6 @@ public class CodeTranslator {
         } catch (Exception ignored){
             throw new IllegalArgumentException("Illegal command type");
         }
-    }
-
-    public String getEndLoop() {
-        return endLoop;
     }
 
     String translateArithmetic(String command){
@@ -118,6 +124,7 @@ public class CodeTranslator {
         throw new IllegalArgumentException("unsupported segment");
     }
 
+
     String translatePush(String segment, int index){
 
         //handel's this, that, argument, temp and local
@@ -154,8 +161,8 @@ public class CodeTranslator {
 
     }
 
-    String parseCommand(String command, CommandTypes type){
-        String[] commandArray = command.split(" ");
+    String parseCommand(String line, CommandTypes type){
+        String[] commandArray = line.split(" ");
         int index;
         switch (type){
             case C_ARITHMETIC:
@@ -167,14 +174,116 @@ public class CodeTranslator {
                 index = Integer.parseInt(commandArray[2]);
                 return translatePop(commandArray[1],index);
             case C_LABLE:
+                return translateLabel(line);
             case C_GOTO:
+                return translateGoto(line);
             case C_IF:
+                return translateIfGoTo(line);
             case C_FUNCTION:
+                return translateFunction(line);
             case C_RETURN:
+                return translatReturn(line);
             case C_CALL:
+                return translateCall(line);
             default:
                 throw new IllegalArgumentException("un supported command type");
         }
+    }
+
+    private String translateCall(String line) {
+        String retAddr = fileName + "$" + (frameCounter++) + "retAddr";
+        String function = line.split(" ")[1];
+        String code =  "@" + retAddr + "\n" +
+                "D=A\n" +
+                "@SP\n" +
+                "A=M\n" +
+                "M=D\n" +
+                "@SP\n" +
+                "M=M+1\n"+
+                translatePush("local",0) +
+                translatePush("argument",0) +
+                translatePush("pointer",0) +
+                translatePush("pointer",1) +
+                "@SP\n" +
+                "D=M\n" +
+                "@5\n"+
+                "D=D-A\n"+
+                "@" + line.split(" ")[2] + "\n"+
+                "D=D-A\n"+
+                "@ARG\n"+
+                "M=D\n" +
+                "@SP\n" +
+                "D=M\n" +
+                "@LCL\n"+
+                "M=D\n" +
+                "@" + function + "\n" +
+                "0;JMP\n" +
+                "(" + retAddr + ")\n";
+
+        return code;
+    }
+
+    private String translatReturn(String line) {
+        String frame = fileName + "$" + (frameCounter) + "frame";
+        String retAddr = fileName + "$" + (frameCounter++) + "retAddr";
+        String[] regs = {"null", "THAT","THIS","ARG" ,"LCL"};
+        String code =
+                    "@LCL       // "+line + "\n " +
+                    "D=M\n" +
+                    "@"+frame +"\n" +
+                    "M=D\n"+
+                    "D=A\n" +
+                    "@5\n" +
+                    "A=D-A\n" +
+                    "D=M\n" +
+                    "@" + retAddr + "\n" +
+                    "M=D\n" +
+                    translatePop("argument",0) +
+                    "@ARG\n" +
+                    "D=M\n" +
+                    "@SP\n" +
+                    "M=D+1\n" ;
+        for (int i = 1; i < 5; i++) {
+            code += "@"+frame +"\n" +
+                    "D=A\n" +
+                    "@" + i + "\n" +
+                    "A=D-A\n" +
+                    "D=M\n" +
+                    "@" + regs[i] + "\n" +
+                    "M=D\n";
+        }
+        code +=  "@" + retAddr + "\n" +
+                "A=M\n" +
+                "0;JMP\n";
+        return code;
+    }
+
+    private String translateFunction(String line) {
+        String command = "(" + line.split(" ")[1]+ ")       // "+line + "\n ";
+        int localVars = Integer.parseInt(line.split(" ")[2]);
+        for (int i = 0; i < localVars; i++) {
+            command += translatePush("constant",0);
+        }
+        return command;
+    }
+
+    private String translateIfGoTo(String command) {
+        String lable = fileName + "$" + command.split(" ")[1];
+        return  "@SP       // "+command + "\n" +
+                "AM=M-1\n" +
+                "D=M\n" +
+                "@"+lable + "\n" +
+                "D;JNE\n";
+    }
+
+    private String translateGoto(String command) {
+         return "@" + fileName + "$" +command.split(" ")[1] + "       // "+command + "\n " +
+                "0;JMP\n";
+    }
+
+    private String translateLabel(String command) {
+        String lable = command.split(" ")[1];
+        return "(" + fileName + "$" + lable + ")\n";
     }
 
     private void fillArithmeticMap() {
